@@ -9,6 +9,7 @@ typedef struct {
     float precioCompra;
     int tipoIngreso; 
     int disponible;
+    int eliminado;
 } Vehiculo;
 
 typedef struct{
@@ -55,6 +56,7 @@ void guardarVenta(Venta *venta);
 void venderVehiculo(Economia *eco);
 void mostrarVentas();
 void pedirDatosClienteVenta(Cliente *c);
+void eliminarVehiculo();
 void informeGanancias(Economia *eco);
 void cargarEconomia(Economia *eco);
 void guardarEconomia(Economia *eco);

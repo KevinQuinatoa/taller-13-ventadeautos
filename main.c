@@ -36,9 +36,12 @@ int main(int argc, char const *argv[])
             venderVehiculo(&eco);
             break;
          case 8:
-            informeGanancias(&eco);
+            eliminarVehiculo();
             break;
          case 9:
+            informeGanancias(&eco);
+            break;
+         case 10:
             printf("Saliendo del sistema...\n");
             return 0;
         
@@ -47,7 +50,7 @@ int main(int argc, char const *argv[])
             break;
         }
    
-    } while(opc1 != 9);
+    } while(opc1 != 10);
 
   return 0;  
 }

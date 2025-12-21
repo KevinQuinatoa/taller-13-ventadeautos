@@ -12,10 +12,11 @@
         printf("5. Buscar vehiculos por marca\n");
         printf("6. Buscar vehiculo por presupuesto\n");
         printf("7. Vender vehiculo\n");
-        printf("8. Informe de ganancias\n");
-        printf("9. Salir\n");
+        printf("8. Eliminar vehiculo\n");
+        printf("9. Informe de ganancias\n");
+        printf("10. Salir\n");
         printf("Seleccione una opcion: ");
-        opc = opcionValida(1,9);
+        opc = opcionValida(1,10);
         return opc;
     }
 
@@ -227,6 +228,7 @@
         vehiculo.precio = opcionValida(1000,1000000);
 
         vehiculo.disponible = 1;
+        vehiculo.eliminado = 0;
 
         guardarVehiculo(&vehiculo);
     }
@@ -268,30 +270,33 @@
     }
 
     void mostrarVehiculos(){
-    Vehiculo vehiculos[100];
-    int cont = leerVehiculos(vehiculos);
+        Vehiculo vehiculos[100];
+        int cont = leerVehiculos(vehiculos);
+        int hay = 0;
 
-    if (cont == 0){
-        printf("No hay vehiculos registrados.\n");
-        return;
+        if (cont == 0){
+            printf("No hay vehiculos registrados.\n");
+            return;
+        }
+
+        for (int i = 0; i < cont; i++){
+            if (vehiculos[i].disponible == 1 && vehiculos[i].eliminado == 0) {
+                printf("Placa: %s\n", vehiculos[i].placa);
+                printf("Marca: %s\n", vehiculos[i].marca);
+                printf("Modelo: %s\n", vehiculos[i].modelo);
+                printf("Tipo: %s\n", vehiculos[i].tipo);
+                printf("Estado: %s\n", vehiculos[i].estado);
+                printf("Precio: $%.2f\n", vehiculos[i].precio);
+                printf("-------------------------------------\n");
+                hay = 1;
+            }
+        }
+
+        if (!hay) {
+            printf("No hay vehiculos disponibles para mostrar.\n");
+        }
     }
 
-    for (int i = 0; i < cont; i++){
-        printf("Placa: %s\n", vehiculos[i].placa);
-        printf("Marca: %s\n", vehiculos[i].marca);
-        printf("Modelo: %s\n", vehiculos[i].modelo);
-        printf("Tipo: %s\n", vehiculos[i].tipo);
-        printf("Estado: %s\n", vehiculos[i].estado);
-        printf("Precio: $%.2f\n", vehiculos[i].precio);
-
-        if (vehiculos[i].disponible == 1)
-            printf("Disponible: SI\n");
-        else
-            printf("Disponible: NO\n");
-
-        printf("-------------------------------------\n");
-    }
-    }
 
 
     void guardarVehiculo(Vehiculo *vehiculo){
@@ -396,7 +401,7 @@
             continue;
         }
         break;
-        } 
+        }   
 
         f = fopen("vehiculos.dat", "rb");
         if (f == NULL){
@@ -405,7 +410,9 @@
         }
 
         while (fread(&v, sizeof(Vehiculo), 1, f)){
-            if (strcmp(v.placa, placaBuscada) == 0){
+            if (strcmp(v.placa, placaBuscada) == 0 &&
+            v.disponible == 1 &&
+            v.eliminado == 0){
                 printf("\nVehiculo encontrado:\n");
                 printf("Placa: %s\n", v.placa);
                 printf("Marca: %s\n", v.marca);
@@ -443,7 +450,9 @@
         }
 
         while (fread(&v, sizeof(Vehiculo), 1, f)){
-            if (strcmp(v.marca, marcaBuscado) == 0 && v.disponible == 1){
+            if (strcmp(v.marca, marcaBuscado) == 0 &&
+            v.disponible == 1 &&
+            v.eliminado == 0){
                 printf("\nPlaca: %s\n", v.placa);
                 printf("Marca: %s\n", v.marca);
                 printf("Modelo: %s\n", v.modelo);
@@ -476,7 +485,9 @@
         }
 
         while (fread(&v, sizeof(Vehiculo), 1, f)){
-            if (v.precio <= presupuesto && v.disponible == 1){
+            if (v.precio <= presupuesto &&
+            v.disponible == 1 &&
+            v.eliminado == 0){
                 printf("\nPlaca: %s\n", v.placa);
                 printf("Marca: %s\n", v.marca);
                 printf("Modelo: %s\n", v.modelo);
@@ -653,6 +664,67 @@
 
         fclose(f);
     }
+
+    void eliminarVehiculo() {
+        FILE *f;
+        Vehiculo v;
+        char placaBuscada[10];
+        long pos;
+        int encontrado = 0;
+
+        f = fopen("vehiculos.dat", "rb+");
+        if (f == NULL) {
+            printf("No se pudo abrir el archivo de vehiculos.\n");
+            return;
+        }
+
+        printf("Ingrese la placa del vehiculo a eliminar: ");
+        eliminarSaltoLinea(placaBuscada, 10);
+
+        while (fread(&v, sizeof(Vehiculo), 1, f)) {
+            if (strcmp(v.placa, placaBuscada) == 0) {
+                encontrado = 1;
+
+                if (v.disponible == 0) {
+                    printf("El vehiculo ya no esta disponible.\n");
+                    fclose(f);
+                    return;
+                }
+
+                printf("\nVehiculo encontrado:\n");
+                printf("Marca: %s\n", v.marca);
+                printf("Modelo: %s\n", v.modelo);
+                printf("Precio: $%.2f\n", v.precio);
+
+                printf("\nDesea eliminar este vehiculo?\n");
+                printf("1. Si\n2. No\n>> ");
+                int opc = opcionValida(1, 2);
+
+                if (opc == 2) {
+                    fclose(f);
+                    return;
+                }
+
+                v.disponible = 0;
+                v.eliminado = 1;
+
+                pos = ftell(f) - sizeof(Vehiculo);
+                fseek(f, pos, SEEK_SET);
+                fwrite(&v, sizeof(Vehiculo), 1, f);
+
+                printf("Vehiculo eliminado correctamente.\n");
+                fclose(f);
+                return;
+            }
+        }
+
+        if (!encontrado) {
+            printf("Vehiculo no encontrado.\n");
+        }
+
+        fclose(f);
+    }
+
 
     void informeGanancias(Economia *eco) {
         printf("----- Informe de Ganancias -----\n");
