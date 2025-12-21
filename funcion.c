@@ -1,0 +1,692 @@
+    #include <stdio.h>
+    #include <string.h> 
+    #include "funcion.h"
+
+    int menu(){
+        int opc;
+        printf("----------------   CONCESIONARIA 'RUEDAS DE ORO' SISTEMA DE GESTION SGIC  ----------------\n");
+        printf("1. Registrar vehiculo\n");
+        printf("2. Mostrar vehiculos registrados\n");
+        printf("3. Mostrar datos de ventas\n");
+        printf("4. Buscar vehiculo por placa\n");
+        printf("5. Buscar vehiculos por marca\n");
+        printf("6. Buscar vehiculo por presupuesto\n");
+        printf("7. Vender vehiculo\n");
+        printf("8. Informe de ganancias\n");
+        printf("9. Salir\n");
+        printf("Seleccione una opcion: ");
+        opc = opcionValida(1,9);
+        return opc;
+    }
+
+    int opcionValida(int min, int max){
+        int numero;
+        while (1)
+        {
+            if (scanf ("%d", &numero) ==1 && numero >= min && numero<=max)
+            {
+                while(getchar()!='\n');
+                return numero;
+            }else{
+                printf("Error, ingrese una opcion valida: ");
+                while(getchar()!='\n');
+            } 
+        }
+    }
+
+    void eliminarSaltoLinea(char *cadena, int n){
+        fflush(stdin);
+        fgets(cadena, n, stdin);
+        int len= strlen(cadena) - 1;
+        cadena[len] = '\0';
+    }
+
+    int menu2(){
+        int opc2;
+        printf("Seleccione la marca del vehiculo:\n");
+        printf("1. Toyota\n");
+        printf("2. Chevrolet\n");
+        printf("3. hyundai\n");
+        printf("Seleccione una opcion: ");
+        opc2 = opcionValida(1,3);
+        return opc2;
+    }
+
+    int menuToyota(){
+        int opc3;
+        printf("Seleccione el modelo del vehiculo:\n");
+        printf("1. Hilux\n");
+        printf("2. Corolla\n");
+        printf("3. RAV4\n");
+        printf("Seleccione una opcion: ");
+        opc3 = opcionValida(1,3);
+        return opc3;
+    }
+
+    int menuChevrolet(){
+        int opc3;
+        printf("Seleccione el modelo del vehiculo:\n");
+        printf("1. Silverado\n");
+        printf("2. Malibu\n");
+        printf("3. Equinox\n");
+        printf("Seleccione una opcion: ");
+        opc3 = opcionValida(1,3);
+        return opc3;
+    }
+
+    int menuHyundai(){
+        int opc3;
+        printf("Seleccione el modelo del vehiculo:\n");
+        printf("1. Tucson\n");
+        printf("2. Elantra\n");
+        printf("3. Santa Fe\n");
+        printf("Seleccione una opcion: ");
+        opc3 = opcionValida(1,3);
+        return opc3;
+    }
+
+    int menuTipo(){
+        int opc4;
+        printf("Seleccione el tipo del vehiculo:\n");
+        printf("1. Sedan\n");
+        printf("2. SUV\n");
+        printf("3. Camioneta\n");
+        printf("Seleccione una opcion: ");
+        opc4 = opcionValida(1,3);
+        return opc4;
+    }
+
+    int menuEstado(){
+        int opc5;
+        printf("Seleccione el estado del vehiculo:\n");
+        printf("1. Nuevo\n");
+        printf("2. Usado\n");
+        printf("Seleccione una opcion: ");
+        opc5 = opcionValida(1,2);
+        return opc5;
+    }
+
+    void ingresarVehiculo(Economia *eco){
+        Vehiculo vehiculo;
+        int opc2, opc3, opc4, opc5;
+
+        printf("Ingrese la placa del vehiculo: ");
+        while (1) {
+        eliminarSaltoLinea(vehiculo.placa, 10);
+        // Validación: NO permitir cadena vacía ni solo espacios
+        if (strlen(vehiculo.placa) == 0) {
+            printf("La placa no puede estar vacio. Ingrese nuevamente: ");
+            continue;
+        }
+
+        // NO permitir negativo: si comienza con '-'
+        if (vehiculo.placa[0] == '-') {
+            printf("No se permiten placas negativas. Ingrese nuevamente: ");
+            continue;
+        }
+        break;
+        }  
+        
+    if (placaExiste(vehiculo.placa)){
+        printf("Error: la placa ya existe.\n");
+        return;
+    }
+
+
+        printf("Ingrese la marca del vehiculo:\n");
+        opc2 = menu2();
+        switch (opc2)
+        {
+        case 1:
+            strcpy(vehiculo.marca, "Toyota");
+            opc3 = menuToyota();
+            switch (opc3)
+            {
+            case 1:
+                strcpy(vehiculo.modelo, "Hilux");
+                break;
+            case 2:
+                strcpy(vehiculo.modelo, "Corolla");
+                break;
+            case 3:
+                strcpy(vehiculo.modelo, "RAV4");
+                break;
+            }
+            break;
+        case 2:
+            strcpy(vehiculo.marca, "Chevrolet");
+            opc3 = menuChevrolet();
+            switch (opc3)
+            {
+            case 1:
+                strcpy(vehiculo.modelo, "Silverado");
+                break;
+            case 2:
+                strcpy(vehiculo.modelo, "Malibu");
+                break;
+            case 3:
+                strcpy(vehiculo.modelo, "Equinox");
+                break;
+            }
+            break;
+        case 3:
+            strcpy(vehiculo.marca, "Hyundai");
+            opc3 = menuHyundai();
+            switch (opc3)
+            {
+            case 1:
+                strcpy(vehiculo.modelo, "Tucson");
+                break;
+            case 2:
+                strcpy(vehiculo.modelo, "Elantra");
+                break;
+            case 3:
+                strcpy(vehiculo.modelo, "Santa Fe");
+                break;
+            }
+            break;
+        }
+
+        opc4 = menuTipo();
+        switch (opc4)
+        {
+        case 1:
+            strcpy(vehiculo.tipo, "Sedan");
+            break;
+        case 2:
+            strcpy(vehiculo.tipo, "SUV");
+            break;
+        case 3:
+            strcpy(vehiculo.tipo, "Camioneta");
+            break;
+        }
+
+        opc5 = menuEstado();
+        switch (opc5)
+        {
+        case 1:
+            strcpy(vehiculo.estado, "Nuevo");
+            break;
+        case 2:
+            strcpy(vehiculo.estado, "Usado");
+            break;
+        }
+          vehiculo.tipoIngreso = menuIngreso();
+
+       if (vehiculo.tipoIngreso == 1){
+        printf("Ingrese el precio de compra del vehiculo: ");
+        vehiculo.precioCompra = opcionValida(1000,1000000);
+
+        eco->totalGastado += vehiculo.precioCompra;
+        guardarEconomia(eco);
+        } else {
+        vehiculo.precioCompra = 0;
+        }
+
+        printf("Ingrese el precio de venta del vehiculo: ");
+        vehiculo.precio = opcionValida(1000,1000000);
+
+        vehiculo.disponible = 1;
+
+        guardarVehiculo(&vehiculo);
+    }
+
+
+    int menuIngreso(){
+    int opc;
+    printf("Seleccione el tipo de ingreso del vehiculo:\n");
+    printf("1. Compra (la concesionaria compra el vehiculo)\n");
+    printf("2. Consignacion (solo para vender)\n");
+    printf("Seleccione una opcion: ");
+    opc = opcionValida(1,2);
+    return opc;
+    }
+
+    void registrarCliente(){
+    Cliente cliente;
+
+    printf("Ingrese el nombre del cliente: ");
+    eliminarSaltoLinea(cliente.nombre, 50);
+
+    printf("Ingrese la edad del cliente: ");
+    cliente.edad = opcionValida(18,100);
+
+    int valido = 0;
+    while (!valido){
+        printf("Ingrese el numero de telefono del cliente: ");
+        eliminarSaltoLinea(cliente.telefono, 20);
+
+        if (strlen(cliente.telefono) != 10){
+            printf("Error: deben ser 10 digitos.\n");
+            continue;
+        }
+
+        valido = 1;
+    }
+
+    guardarCliente(&cliente);
+    }
+
+    void mostrarVehiculos(){
+    Vehiculo vehiculos[100];
+    int cont = leerVehiculos(vehiculos);
+
+    if (cont == 0){
+        printf("No hay vehiculos registrados.\n");
+        return;
+    }
+
+    for (int i = 0; i < cont; i++){
+        printf("Placa: %s\n", vehiculos[i].placa);
+        printf("Marca: %s\n", vehiculos[i].marca);
+        printf("Modelo: %s\n", vehiculos[i].modelo);
+        printf("Tipo: %s\n", vehiculos[i].tipo);
+        printf("Estado: %s\n", vehiculos[i].estado);
+        printf("Precio: $%.2f\n", vehiculos[i].precio);
+
+        if (vehiculos[i].disponible == 1)
+            printf("Disponible: SI\n");
+        else
+            printf("Disponible: NO\n");
+
+        printf("-------------------------------------\n");
+    }
+    }
+
+
+    void guardarVehiculo(Vehiculo *vehiculo){
+    FILE *f;
+    f = fopen("vehiculos.dat", "ab+");
+
+    if (f == NULL){
+        printf("No se puede abrir el archivo de vehiculos.\n");
+        return;
+    }
+
+    fwrite(vehiculo, sizeof(Vehiculo), 1, f);
+    fclose(f);
+
+    printf("Vehiculo registrado correctamente.\n");
+    }
+
+    int leerVehiculos(Vehiculo *vehiculos){
+    FILE *f;
+    f = fopen("vehiculos.dat", "rb");
+
+    if (f == NULL){
+        return 0;
+    }
+
+    int count = fread(vehiculos, sizeof(Vehiculo), 100, f);
+    fclose(f);
+    return count;
+    }
+
+
+
+    void guardarCliente(Cliente *cliente){
+    FILE *f;
+    f = fopen("clientes.dat", "ab+");
+
+    if (f == NULL){
+        printf("No se puede abrir el archivo de clientes.\n");
+        return;
+    }
+
+    fwrite(cliente, sizeof(Cliente), 1, f);
+    fclose(f);
+
+    printf("Cliente registrado correctamente.\n");
+    }
+
+
+    int leerClientes(Cliente *clientes){
+    FILE *f;
+    f = fopen("clientes.dat", "rb");
+
+    if (f == NULL){
+        return 0;
+    }
+
+    int count = fread(clientes, sizeof(Cliente), 50, f);
+    fclose(f);
+    return count;
+    }
+
+
+    int placaExiste(char *placa) {
+        FILE *archivo;
+        Vehiculo v;
+
+        archivo = fopen("vehiculos.dat", "rb");
+        if (archivo == NULL) {
+            return 0; // Si el archivo no existe, no hay duplicados
+        }
+
+        while (fread(&v, sizeof(Vehiculo), 1, archivo)) {
+            if (strcmp(v.placa, placa) == 0) {
+                fclose(archivo);
+                return 1; // Placa encontrada
+            }
+        }
+
+        fclose(archivo);
+        return 0; // Placa no encontrada
+    }
+
+
+    void buscarVehiculoPorPlaca(){
+        FILE *f;
+        Vehiculo v;
+        char placaBuscada[10];
+        int encontrado = 0;
+
+        printf("Ingrese la placa a buscar: ");
+        while (1) {
+        eliminarSaltoLinea(placaBuscada, 10);
+        // Validación: NO permitir cadena vacía ni solo espacios
+        if (strlen(placaBuscada) == 0) {
+            printf("La placa no puede estar vacio. Ingrese nuevamente: ");
+            continue;
+        }
+
+        // NO permitir negativo: si comienza con '-'
+        if (placaBuscada[0] == '-') {
+            printf("No se permiten placas negativas. Ingrese nuevamente: ");
+            continue;
+        }
+        break;
+        } 
+
+        f = fopen("vehiculos.dat", "rb");
+        if (f == NULL){
+            printf("No hay vehiculos registrados.\n");
+            return;
+        }
+
+        while (fread(&v, sizeof(Vehiculo), 1, f)){
+            if (strcmp(v.placa, placaBuscada) == 0){
+                printf("\nVehiculo encontrado:\n");
+                printf("Placa: %s\n", v.placa);
+                printf("Marca: %s\n", v.marca);
+                printf("Modelo: %s\n", v.modelo);
+                printf("Tipo: %s\n", v.tipo);
+                printf("Estado: %s\n", v.estado);
+                printf("Precio: $%.2f\n", v.precio);
+                printf("Disponible: %s\n", v.disponible ? "SI" : "NO");
+
+                encontrado = 1;
+                break;
+            }
+        }
+
+        fclose(f);
+
+        if (!encontrado){
+            printf("Vehiculo no encontrado.\n");
+        }
+    }
+
+    void buscarVehiculosPorMarca(){
+        FILE *f;
+        Vehiculo v;
+        char marcaBuscado[20];
+        int encontrados = 0;
+
+        printf("Ingrese el modelo a buscar: ");
+        eliminarSaltoLinea(marcaBuscado, 20);
+
+        f = fopen("vehiculos.dat", "rb");
+        if (f == NULL){
+            printf("No hay vehiculos registrados.\n");
+            return;
+        }
+
+        while (fread(&v, sizeof(Vehiculo), 1, f)){
+            if (strcmp(v.marca, marcaBuscado) == 0 && v.disponible == 1){
+                printf("\nPlaca: %s\n", v.placa);
+                printf("Marca: %s\n", v.marca);
+                printf("Modelo: %s\n", v.modelo);
+                printf("Precio: $%.2f\n", v.precio);
+                printf("---------------------------------\n");
+                encontrados++;
+            }
+        }
+
+        fclose(f);
+
+        if (encontrados == 0){
+            printf("No se encontraron vehiculos con esa marca.\n");
+        }
+    }
+
+    void buscarVehiculosPorPresupuesto(){
+        FILE *f;
+        Vehiculo v;
+        float presupuesto;
+        int encontrados = 0;
+
+        printf("Ingrese el presupuesto maximo del cliente: ");
+        presupuesto = opcionValida(1000, 1000000);
+
+        f = fopen("vehiculos.dat", "rb");
+        if (f == NULL){
+            printf("No hay vehiculos registrados.\n");
+            return;
+        }
+
+        while (fread(&v, sizeof(Vehiculo), 1, f)){
+            if (v.precio <= presupuesto && v.disponible == 1){
+                printf("\nPlaca: %s\n", v.placa);
+                printf("Marca: %s\n", v.marca);
+                printf("Modelo: %s\n", v.modelo);
+                printf("Precio: $%.2f\n", v.precio);
+                printf("---------------------------------\n");
+                encontrados++;
+            }
+        }
+
+        fclose(f);
+
+        if (encontrados == 0){
+            printf("No hay vehiculos dentro del presupuesto.\n");
+        }
+    }
+
+    void pedirDatosClienteVenta(Cliente *c) {
+        printf("\n--- DATOS DEL CLIENTE ---\n");
+        printf("Nombre: ");
+        eliminarSaltoLinea(c->nombre, 50);
+
+        printf("Edad: ");
+        scanf("%d", &c->edad);
+        while (getchar() != '\n');
+
+        int valido = 0;
+        while (!valido) {
+            printf("Telefono (10 digitos): ");
+            eliminarSaltoLinea(c->telefono, 20);
+
+            if (strlen(c->telefono) != 10) {
+                printf("Telefono invalido.\n");
+                continue;
+            }
+
+            valido = 1;
+            for (int i = 0; i < 10; i++) {
+                if (c->telefono[i] < '0' || c->telefono[i] > '9') {
+                    valido = 0;
+                    printf("Solo numeros permitidos.\n");
+                    break;
+                }
+            }
+        }
+    }
+
+    void guardarVenta(Venta *venta) {
+    FILE *f = fopen("ventas.dat", "ab+");
+    if (f == NULL) {
+        printf("Error al guardar la venta.\n");
+        return;
+    }
+
+    fwrite(venta, sizeof(Venta), 1, f);
+    fclose(f);
+    }
+
+    void guardarEconomia(Economia *eco) {
+        FILE *f = fopen("economia.dat", "wb+");
+        if (f == NULL) {
+            printf("Error al guardar economia\n");
+            return;
+        }
+        fwrite(eco, sizeof(Economia), 1, f);
+        fclose(f);
+    }
+
+    void cargarEconomia(Economia *eco) {
+        FILE *f = fopen("economia.dat", "rb+");
+        if (f == NULL) {
+            eco->totalGastado = 0;
+            eco->totalGanado = 0;
+            return;
+        }
+        fread(eco, sizeof(Economia), 1, f);
+        fclose(f);
+    }
+
+
+    void venderVehiculo(Economia *eco) {
+        FILE *f;
+        Vehiculo v;
+        char placaBuscada[10];
+        int encontrado = 0;
+        Cliente clienteVenta;
+        long pos;
+        Venta venta;
+
+        f = fopen("vehiculos.dat", "rb+");
+        if (f == NULL) {
+            printf("Error al abrir el archivo de vehiculos\n");
+            return;
+        }
+
+        printf("Ingrese la placa del vehiculo a vender: ");
+        while (1) {
+        eliminarSaltoLinea(placaBuscada, 10);
+        // Validación: NO permitir cadena vacía ni solo espacios
+        if (strlen(placaBuscada) == 0) {
+            printf("La placa no puede estar vacio. Ingrese nuevamente: ");
+            continue;
+        }
+
+        // NO permitir negativo: si comienza con '-'
+        if (placaBuscada[0] == '-') {
+            printf("No se permiten placas negativas. Ingrese nuevamente: ");
+            continue;
+        }
+        break;
+        } 
+
+        while (fread(&v, sizeof(Vehiculo), 1, f)) {
+            if (strcmp(v.placa, placaBuscada) == 0) {
+                encontrado = 1;
+
+                if (v.disponible == 0) {
+                    printf("El vehiculo ya fue vendido.\n");
+                    fclose(f);
+                    return;
+                }
+
+                // Mostrar datos
+                printf("\nVehiculo encontrado:\n");
+                printf("Marca: %s\n", v.marca);
+                printf("Modelo: %s\n", v.modelo);
+                printf("Precio: $%.2f\n", v.precio);
+
+                printf("\nDesea vender este vehiculo?\n");
+                printf("1. Si\n2. No\n>> ");
+                int opc = opcionValida(1, 2);
+
+                if (opc == 2) {
+                    fclose(f);
+                    return;
+                }
+
+                pedirDatosClienteVenta(&clienteVenta);
+
+                // Calcular ganancias
+                if (v.tipoIngreso == 1) { // Compra
+                    eco->totalGanado += (v.precio - v.precioCompra);
+                } else { // Consignación
+                    eco->totalGanado += v.precio;
+                }
+
+                guardarEconomia(eco);
+
+
+                // Marcar como vendido
+                v.disponible = 0;
+
+                   // Preparar venta
+                venta.vehiculo = v;
+                venta.cliente = clienteVenta;
+                venta.montoVenta = v.precio;
+
+                // Volver una posición atrás y sobrescribir
+                pos = ftell(f) - sizeof(Vehiculo);
+                fseek(f, pos, SEEK_SET);
+                fwrite(&v, sizeof(Vehiculo), 1, f);
+
+                // Guardar venta
+                guardarVenta(&venta);
+
+                printf("Vehiculo vendido exitosamente.\n");
+                fclose(f);
+                return;
+            }
+        }
+
+        if (!encontrado) {
+            printf("Vehiculo no encontrado.\n");
+        }
+
+        fclose(f);
+    }
+
+    void informeGanancias(Economia *eco) {
+        printf("----- Informe de Ganancias -----\n");
+        printf("Total Gastado: $%.2f\n", eco->totalGastado);
+        printf("Total Ganado: $%.2f\n", eco->totalGanado);
+        printf("Ganancia Neta: $%.2f\n", eco->totalGanado - eco->totalGastado);
+        printf("--------------------------------\n");
+    }
+
+    void mostrarVentas() {
+        FILE *f = fopen("ventas.dat", "rb");
+        Venta v;
+
+        if (f == NULL) {
+            printf("No existen ventas registradas.\n");
+            return;
+        }
+
+        printf("\n====== HISTORIAL DE VENTAS ======\n");
+
+        while (fread(&v, sizeof(Venta), 1, f)) {
+            printf("\nCliente:\n");
+            printf("Nombre: %s\n", v.cliente.nombre);
+            printf("Telefono: %s\n", v.cliente.telefono);
+
+            printf("\nVehiculo:\n");
+            printf("Placa: %s\n", v.vehiculo.placa);
+            printf("Marca: %s\n", v.vehiculo.marca);
+            printf("Modelo: %s\n", v.vehiculo.modelo);
+            printf("Tipo: %s\n", v.vehiculo.tipo);
+            printf("Precio venta: $%.2f\n", v.montoVenta);
+
+            printf("---------------------------------\n");
+        }
+
+        fclose(f);
+    }
