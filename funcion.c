@@ -226,6 +226,14 @@
         vehiculo.precioCompra = 0;
         }
 
+        // Anio del vehiculo
+        printf("Ingrese el anio del vehiculo: ");
+        vehiculo.anio = opcionValida(1980, 2026);
+
+        // Color del vehiculo
+        printf("Ingrese el color del vehiculo: ");
+        eliminarSaltoLinea(vehiculo.color, 20);
+
         printf("Ingrese el precio de venta del vehiculo: ");
         vehiculo.precio = opcionValida(1000,1000000);
 
@@ -345,6 +353,8 @@
                 printf("Modelo: %s\n", vehiculos[i].modelo);
                 printf("Tipo: %s\n", vehiculos[i].tipo);
                 printf("Estado: %s\n", vehiculos[i].estado);
+                printf("Anio: %d\n", vehiculos[i].anio);
+                printf("Color: %s\n", vehiculos[i].color);
                 printf("Precio: $%.2f\n", vehiculos[i].precio);
                 printf("-------------------------------------\n");
                 hay = 1;
@@ -477,6 +487,8 @@
                 printf("Modelo: %s\n", v.modelo);
                 printf("Tipo: %s\n", v.tipo);
                 printf("Estado: %s\n", v.estado);
+                printf("Anio: %d\n", v.anio);
+                printf("Color: %s\n", v.color);
                 printf("Precio: $%.2f\n", v.precio);
                 printf("Disponible: %s\n", v.disponible ? "SI" : "NO");
 
@@ -514,6 +526,8 @@
                 printf("\nPlaca: %s\n", v.placa);
                 printf("Marca: %s\n", v.marca);
                 printf("Modelo: %s\n", v.modelo);
+                printf("Anio: %d\n", v.anio);
+                printf("Color: %s\n", v.color);
                 printf("Precio: $%.2f\n", v.precio);
                 printf("---------------------------------\n");
                 encontrados++;
@@ -549,6 +563,8 @@
                 printf("\nPlaca: %s\n", v.placa);
                 printf("Marca: %s\n", v.marca);
                 printf("Modelo: %s\n", v.modelo);
+                printf("Anio: %d\n", v.anio);
+                printf("Color: %s\n", v.color);
                 printf("Precio: $%.2f\n", v.precio);
                 printf("---------------------------------\n");
                 encontrados++;
@@ -642,6 +658,8 @@
             printf("\nVehiculo encontrado:\n");
             printf("Marca: %s\n", v.marca);
             printf("Modelo: %s\n", v.modelo);
+            printf("Anio: %d\n", v.anio);
+            printf("Color: %s\n", v.color);
             printf("Precio: $%.2f\n", v.precio);
 
             printf("\nDesea vender este vehiculo?\n");
@@ -801,7 +819,7 @@
 
         printf("\n--- DATOS DEL CLIENTE ---\n");
         printf("Nombre: %s\n", v.cliente.nombre);
-        printf("Edad: %d años\n", v.cliente.edad);
+        printf("Edad: %d anios\n", v.cliente.edad);
         printf("Telefono: %s\n", v.cliente.telefono);
 
         printf("\n--- DATOS DEL VENDEDOR ---\n");
@@ -811,6 +829,8 @@
         printf("Placa: %s\n", v.vehiculo.placa);
         printf("Marca: %s\n", v.vehiculo.marca);
         printf("Modelo: %s\n", v.vehiculo.modelo);
+        printf("Anio: %d\n", v.vehiculo.anio);
+        printf("Color: %s\n", v.vehiculo.color);
         printf("Precio de venta: $%.2f\n", v.montoVenta);
 
         printf("---------------------------------\n");

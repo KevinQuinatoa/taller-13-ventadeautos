@@ -5,12 +5,15 @@ typedef struct {
     char modelo[20];
     char tipo[20];
     char estado[20];
+    char color[20];      // NUEVO
+    int anio;            // NUEVO
     float precio;
     float precioCompra;
-    int tipoIngreso; 
+    int tipoIngreso;
     int disponible;
     int eliminado;
 } Vehiculo;
+
 
 typedef struct{
     char nombre[50];
