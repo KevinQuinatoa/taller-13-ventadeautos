@@ -392,24 +392,23 @@
 
 
     int placaExiste(char *placa) {
-        FILE *archivo;
-        Vehiculo v;
+    FILE *f;
+    Vehiculo v;
 
-        archivo = fopen("vehiculos.dat", "rb");
-        if (archivo == NULL) {
-            return 0; // Si el archivo no existe, no hay duplicados
+    f = fopen("vehiculos.dat", "rb");
+    if (f == NULL) return 0;
+
+    while (fread(&v, sizeof(Vehiculo), 1, f)) {
+        if (strcmp(v.placa, placa) == 0 && v.eliminado == 0) {
+            fclose(f);
+            return 1; // SOLO si NO está eliminado
         }
-
-        while (fread(&v, sizeof(Vehiculo), 1, archivo)) {
-            if (strcmp(v.placa, placa) == 0) {
-                fclose(archivo);
-                return 1; // Placa encontrada
-            }
-        }
-
-        fclose(archivo);
-        return 0; // Placa no encontrada
     }
+
+    fclose(f);
+    return 0;
+    }
+
 
 
     void buscarVehiculoPorPlaca(){
