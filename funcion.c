@@ -684,7 +684,7 @@
 
             // Descontar dinero al cliente
             clienteVenta.efectivo -= v.precio;
-            actualizarCliente(clienteVenta); // función que reescribe el cliente
+            guardarCliente(&clienteVenta); // función que reescribe el cliente
 
             // Marcar vehiculo como vendido
             v.disponible = 0;
