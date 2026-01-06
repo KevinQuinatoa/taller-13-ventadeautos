@@ -248,57 +248,84 @@
 
     void registrarCliente(){
     Cliente cliente;
-    int valido = 0;
 
     printf("Ingrese el nombre del cliente: ");
     eliminarSaltoLinea(cliente.nombre, 50);
 
-     while (!valido) {
+    // Edad
+    printf("Ingrese la edad del cliente: ");
+    cliente.edad = opcionValida(18, 100);
+
+    // Cedula
+    int valido = 0;
+    while (!valido){
         printf("Ingrese la cedula del cliente (10 digitos): ");
         eliminarSaltoLinea(cliente.cedula, 15);
 
-        if (strlen(cliente.cedula) != 10) {
+        if (strlen(cliente.cedula) != 10){
             printf("Error: la cedula debe tener 10 digitos.\n");
             continue;
         }
 
-        int soloNumeros = 1;
-        for (int i = 0; i < 10; i++) {
-            if (cliente.cedula[i] < '0' || cliente.cedula[i] > '9') {
-                soloNumeros = 0;
+        int esNumero = 1;
+        for (int i = 0; i < 10; i++){
+            if (cliente.cedula[i] < '0' || cliente.cedula[i] > '9'){
+                esNumero = 0;
                 break;
             }
         }
 
-        if (!soloNumeros) {
+        if (!esNumero){
             printf("Error: la cedula solo debe contener numeros.\n");
             continue;
-        }
-
-        // Verificar duplicado
-        if (buscarClientePorCedula(cliente.cedula, &cliente)) {
-            printf("Error: ya existe un cliente con esa cedula.\n");
-            return;
         }
 
         valido = 1;
     }
 
-    int valido2 = 0;
-    while (!valido2){
-        printf("Ingrese el numero de telefono del cliente: ");
-        eliminarSaltoLinea(cliente.telefono, 20);
+    // Teléfono
+    valido = 0;
+    while (!valido){
+        printf("Ingrese el telefono del cliente (10 digitos): ");
+        eliminarSaltoLinea(cliente.telefono, 15);
 
         if (strlen(cliente.telefono) != 10){
-            printf("Error: deben ser 10 digitos.\n");
+            printf("Error: el telefono debe tener 10 digitos.\n");
             continue;
         }
 
-        valido2 = 1;
+        int esNumero = 1;
+        for (int i = 0; i < 10; i++){
+            if (cliente.telefono[i] < '0' || cliente.telefono[i] > '9'){
+                esNumero = 0;
+                break;
+            }
+        }
+
+        if (!esNumero){
+            printf("Error: el telefono solo debe contener numeros.\n");
+            continue;
+        }
+
+        valido = 1;
     }
 
-    guardarCliente(&cliente);
+    // Asesor
+    printf("Ingrese el nombre del asesor que atiende al cliente: ");
+    eliminarSaltoLinea(cliente.asesor, 50);
+
+    // Efectivo disponible
+    printf("Ingrese el efectivo disponible del cliente: ");
+    while (scanf("%f", &cliente.efectivo) != 1 || cliente.efectivo < 0){
+        printf("Error. Ingrese un monto valido: ");
+        while (getchar() != '\n');
     }
+    while (getchar() != '\n');
+
+    guardarCliente(&cliente);
+    printf("Cliente registrado correctamente.\n");
+    }
+
 
 
     void mostrarVehiculos(){
@@ -584,106 +611,111 @@
 
 
     void venderVehiculo(Economia *eco) {
-        FILE *f;
-        Vehiculo v;
-        char placaBuscada[10];
-        int encontrado = 0;
-        Cliente clienteVenta;
-        long pos;
-        Venta venta;
+    FILE *f;
+    Vehiculo v;
+    char placaBuscada[10];
+    int encontrado = 0;
+    Cliente clienteVenta;
+    long pos;
+    Venta venta;
 
-        f = fopen("vehiculos.dat", "rb+");
-        if (f == NULL) {
-            printf("Error al abrir el archivo de vehiculos\n");
-            return;
-        }
+    f = fopen("vehiculos.dat", "rb+");
+    if (f == NULL) {
+        printf("Error al abrir el archivo de vehiculos\n");
+        return;
+    }
 
-        printf("Ingrese la placa del vehiculo a vender: ");
-        while (1) {
-        eliminarSaltoLinea(placaBuscada, 10);
-        // Validación: NO permitir cadena vacía ni solo espacios
-        if (strlen(placaBuscada) == 0) {
-            printf("La placa no puede estar vacio. Ingrese nuevamente: ");
-            continue;
-        }
+    printf("Ingrese la placa del vehiculo a vender: ");
+    eliminarSaltoLinea(placaBuscada, 10);
 
-        // NO permitir negativo: si comienza con '-'
-        if (placaBuscada[0] == '-') {
-            printf("No se permiten placas negativas. Ingrese nuevamente: ");
-            continue;
-        }
-        break;
-        } 
+    while (fread(&v, sizeof(Vehiculo), 1, f)) {
+        if (strcmp(v.placa, placaBuscada) == 0 && v.eliminado == 0) {
+            encontrado = 1;
 
-        while (fread(&v, sizeof(Vehiculo), 1, f)) {
-            if (strcmp(v.placa, placaBuscada) == 0) {
-                encontrado = 1;
-
-                if (v.disponible == 0) {
-                    printf("El vehiculo ya fue vendido.\n");
-                    fclose(f);
-                    return;
-                }
-
-                // Mostrar datos
-                printf("\nVehiculo encontrado:\n");
-                printf("Marca: %s\n", v.marca);
-                printf("Modelo: %s\n", v.modelo);
-                printf("Precio: $%.2f\n", v.precio);
-
-                printf("\nDesea vender este vehiculo?\n");
-                printf("1. Si\n2. No\n>> ");
-                int opc = opcionValida(1, 2);
-
-                if (opc == 2) {
-                    fclose(f);
-                    return;
-                }
-
-                // Buscar cliente por cedula
-                if (!pedirCedulaClienteVenta(&clienteVenta)) {
-                    fclose(f);
-                    return;
-                }
-
-                // Calcular ganancias
-                if (v.tipoIngreso == 1) { // Compra
-                    eco->totalGanado += (v.precio - v.precioCompra);
-                } else { // Consignación
-                    eco->totalGanado += v.precio;
-                }
-
-                guardarEconomia(eco);
-
-
-                // Marcar como vendido
-                v.disponible = 0;
-
-                   // Preparar venta
-                venta.vehiculo = v;
-                venta.cliente = clienteVenta;
-                venta.montoVenta = v.precio;
-
-                // Volver una posición atrás y sobrescribir
-                pos = ftell(f) - sizeof(Vehiculo);
-                fseek(f, pos, SEEK_SET);
-                fwrite(&v, sizeof(Vehiculo), 1, f);
-
-                // Guardar venta
-                guardarVenta(&venta);
-
-                printf("Vehiculo vendido exitosamente.\n");
+            if (v.disponible == 0) {
+                printf("El vehiculo ya fue vendido.\n");
                 fclose(f);
                 return;
             }
-        }
 
-        if (!encontrado) {
-            printf("Vehiculo no encontrado.\n");
-        }
+            // Mostrar datos del vehiculo
+            printf("\nVehiculo encontrado:\n");
+            printf("Marca: %s\n", v.marca);
+            printf("Modelo: %s\n", v.modelo);
+            printf("Precio: $%.2f\n", v.precio);
 
-        fclose(f);
+            printf("\nDesea vender este vehiculo?\n");
+            printf("1. Si\n2. No\n>> ");
+            int opc = opcionValida(1, 2);
+
+            if (opc == 2) {
+                fclose(f);
+                return;
+            }
+
+            // Buscar cliente por cedula
+            char cedula[15];
+            printf("Ingrese la cedula del cliente: ");
+            eliminarSaltoLinea(cedula, 15);
+
+            if (!buscarClientePorCedula(cedula, &clienteVenta)) {
+                printf("Cliente no registrado.\n");
+                fclose(f);
+                return;
+            }
+
+            // VALIDAR EFECTIVO
+            if (clienteVenta.efectivo < v.precio) {
+                printf("\nEl cliente NO tiene suficiente efectivo.\n");
+                printf("Disponible: $%.2f\n", clienteVenta.efectivo);
+                printf("Precio del vehiculo: $%.2f\n", v.precio);
+                fclose(f);
+                return;
+            }
+
+            // Calcular ganancias
+            if (v.tipoIngreso == 1) { // Compra
+                eco->totalGanado += (v.precio - v.precioCompra);
+            } else { // Consignación
+                eco->totalGanado += v.precio;
+            }
+
+            guardarEconomia(eco);
+
+            // Descontar dinero al cliente
+            clienteVenta.efectivo -= v.precio;
+            actualizarCliente(clienteVenta); // función que reescribe el cliente
+
+            // Marcar vehiculo como vendido
+            v.disponible = 0;
+
+            // Preparar venta
+            venta.vehiculo = v;
+            venta.cliente = clienteVenta;
+            venta.montoVenta = v.precio;
+
+            // Sobrescribir vehiculo en archivo
+            pos = ftell(f) - sizeof(Vehiculo);
+            fseek(f, pos, SEEK_SET);
+            fwrite(&v, sizeof(Vehiculo), 1, f);
+            printf("Ingrese el nombre del vendedor: ");
+            eliminarSaltoLinea(venta.vendedor, 50);
+            // Guardar venta
+            guardarVenta(&venta);
+
+            printf("\nVehiculo vendido exitosamente.\n");
+            fclose(f);
+            return;
+        }
     }
+
+    if (!encontrado) {
+        printf("Vehiculo no encontrado.\n");
+    }
+
+    fclose(f);
+    }
+
 
     void eliminarVehiculo() {
         FILE *f;
@@ -755,33 +787,38 @@
     }
 
     void mostrarVentas() {
-        FILE *f = fopen("ventas.dat", "rb");
-        Venta v;
+    FILE *f = fopen("ventas.dat", "rb");
+    Venta v;
 
-        if (f == NULL) {
-            printf("No existen ventas registradas.\n");
-            return;
-        }
-
-        printf("\n====== HISTORIAL DE VENTAS ======\n");
-
-        while (fread(&v, sizeof(Venta), 1, f)) {
-            printf("\nCliente:\n");
-            printf("Nombre: %s\n", v.cliente.nombre);
-            printf("Telefono: %s\n", v.cliente.telefono);
-
-            printf("\nVehiculo:\n");
-            printf("Placa: %s\n", v.vehiculo.placa);
-            printf("Marca: %s\n", v.vehiculo.marca);
-            printf("Modelo: %s\n", v.vehiculo.modelo);
-            printf("Tipo: %s\n", v.vehiculo.tipo);
-            printf("Precio venta: $%.2f\n", v.montoVenta);
-
-            printf("---------------------------------\n");
-        }
-
-        fclose(f);
+    if (f == NULL) {
+        printf("No existen ventas registradas.\n");
+        return;
     }
+
+    printf("\n====== HISTORIAL DE VENTAS ======\n");
+
+    while (fread(&v, sizeof(Venta), 1, f)) {
+
+        printf("\n--- DATOS DEL CLIENTE ---\n");
+        printf("Nombre: %s\n", v.cliente.nombre);
+        printf("Edad: %d años\n", v.cliente.edad);
+        printf("Telefono: %s\n", v.cliente.telefono);
+
+        printf("\n--- DATOS DEL VENDEDOR ---\n");
+        printf("Atendido por: %s\n", v.vendedor);
+
+        printf("\n--- DATOS DEL VEHICULO ---\n");
+        printf("Placa: %s\n", v.vehiculo.placa);
+        printf("Marca: %s\n", v.vehiculo.marca);
+        printf("Modelo: %s\n", v.vehiculo.modelo);
+        printf("Precio de venta: $%.2f\n", v.montoVenta);
+
+        printf("---------------------------------\n");
+    }
+
+    fclose(f);
+    }
+
 
     void buscarClienteMenu() {
     char cedula[15];

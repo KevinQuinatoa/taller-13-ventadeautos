@@ -12,15 +12,20 @@ typedef struct {
     int eliminado;
 } Vehiculo;
 
-typedef struct {
+typedef struct{
     char nombre[50];
+    int edad;
     char cedula[15];
     char telefono[15];
+    char asesor[50];
+    float efectivo;   // Dinero disponible del cliente
 } Cliente;
+
 
 typedef struct {
     Vehiculo vehiculo;
     Cliente cliente;
+    char vendedor[50];   // 👈 NUEVO
     float montoVenta;
 } Venta;
 
