@@ -6,17 +6,19 @@
         int opc;
         printf("----------------   CONCESIONARIA 'RUEDAS DE ORO' SISTEMA DE GESTION SGIC  ----------------\n");
         printf("1. Registrar vehiculo\n");
-        printf("2. Mostrar vehiculos registrados\n");
-        printf("3. Mostrar datos de ventas\n");
-        printf("4. Buscar vehiculo por placa\n");
-        printf("5. Buscar vehiculos por marca\n");
-        printf("6. Buscar vehiculo por presupuesto\n");
-        printf("7. Vender vehiculo\n");
-        printf("8. Eliminar vehiculo\n");
-        printf("9. Informe de ganancias\n");
-        printf("10. Salir\n");
+        printf("2. Registrar cliente\n");
+        printf("3. Mostrar vehiculos registrados\n");
+        printf("4. Mostrar datos de ventas\n");
+        printf("5. Buscar vehiculo por placa\n");
+        printf("6. Buscar vehiculos por marca\n");
+        printf("7. Buscar vehiculo por presupuesto\n");
+        printf("8. Buscar cliente\n");
+        printf("9. Vender vehiculo\n");
+        printf("10. Eliminar vehiculo\n");
+        printf("11. Informe de ganancias\n");
+        printf("12. Salir\n");
         printf("Seleccione una opcion: ");
-        opc = opcionValida(1,10);
+        opc = opcionValida(1,12);
         return opc;
     }
 
@@ -246,15 +248,44 @@
 
     void registrarCliente(){
     Cliente cliente;
+    int valido = 0;
 
     printf("Ingrese el nombre del cliente: ");
     eliminarSaltoLinea(cliente.nombre, 50);
 
-    printf("Ingrese la edad del cliente: ");
-    cliente.edad = opcionValida(18,100);
+     while (!valido) {
+        printf("Ingrese la cedula del cliente (10 digitos): ");
+        eliminarSaltoLinea(cliente.cedula, 15);
 
-    int valido = 0;
-    while (!valido){
+        if (strlen(cliente.cedula) != 10) {
+            printf("Error: la cedula debe tener 10 digitos.\n");
+            continue;
+        }
+
+        int soloNumeros = 1;
+        for (int i = 0; i < 10; i++) {
+            if (cliente.cedula[i] < '0' || cliente.cedula[i] > '9') {
+                soloNumeros = 0;
+                break;
+            }
+        }
+
+        if (!soloNumeros) {
+            printf("Error: la cedula solo debe contener numeros.\n");
+            continue;
+        }
+
+        // Verificar duplicado
+        if (buscarClientePorCedula(cliente.cedula, &cliente)) {
+            printf("Error: ya existe un cliente con esa cedula.\n");
+            return;
+        }
+
+        valido = 1;
+    }
+
+    int valido2 = 0;
+    while (!valido2){
         printf("Ingrese el numero de telefono del cliente: ");
         eliminarSaltoLinea(cliente.telefono, 20);
 
@@ -263,11 +294,12 @@
             continue;
         }
 
-        valido = 1;
+        valido2 = 1;
     }
 
     guardarCliente(&cliente);
     }
+
 
     void mostrarVehiculos(){
         Vehiculo vehiculos[100];
@@ -504,34 +536,19 @@
         }
     }
 
-    void pedirDatosClienteVenta(Cliente *c) {
-        printf("\n--- DATOS DEL CLIENTE ---\n");
-        printf("Nombre: ");
-        eliminarSaltoLinea(c->nombre, 50);
 
-        printf("Edad: ");
-        scanf("%d", &c->edad);
-        while (getchar() != '\n');
+    int pedirCedulaClienteVenta(Cliente *clienteVenta) {
+    char cedula[15];
 
-        int valido = 0;
-        while (!valido) {
-            printf("Telefono (10 digitos): ");
-            eliminarSaltoLinea(c->telefono, 20);
+    printf("\nIngrese la cedula del cliente: ");
+    eliminarSaltoLinea(cedula, 15);
 
-            if (strlen(c->telefono) != 10) {
-                printf("Telefono invalido.\n");
-                continue;
-            }
+    if (buscarClientePorCedula(cedula, clienteVenta)) {
+        return 1; // cliente encontrado
+    }
 
-            valido = 1;
-            for (int i = 0; i < 10; i++) {
-                if (c->telefono[i] < '0' || c->telefono[i] > '9') {
-                    valido = 0;
-                    printf("Solo numeros permitidos.\n");
-                    break;
-                }
-            }
-        }
+    printf("Cliente no registrado. Debe registrarlo primero.\n");
+    return 0;
     }
 
     void guardarVenta(Venta *venta) {
@@ -624,7 +641,11 @@
                     return;
                 }
 
-                pedirDatosClienteVenta(&clienteVenta);
+                // Buscar cliente por cedula
+                if (!pedirCedulaClienteVenta(&clienteVenta)) {
+                    fclose(f);
+                    return;
+                }
 
                 // Calcular ganancias
                 if (v.tipoIngreso == 1) { // Compra
@@ -762,3 +783,50 @@
 
         fclose(f);
     }
+
+    void buscarClienteMenu() {
+    char cedula[15];
+    Cliente cliente;
+
+    // Limpiar buffer antes de fgets
+    while (getchar() != '\n');
+
+    printf("Ingrese la cedula del cliente: ");
+    eliminarSaltoLinea(cedula, 15);
+
+    if (strlen(cedula) == 0) {
+        printf("No se ingreso ninguna cedula.\n");
+        return;
+    }
+
+    if (buscarClientePorCedula(cedula, &cliente)) {
+        printf("\n--- CLIENTE ENCONTRADO ---\n");
+        printf("Nombre  : %s\n", cliente.nombre);
+        printf("Cedula  : %s\n", cliente.cedula);
+        printf("Telefono: %s\n", cliente.telefono);
+    } else {
+        printf("Cliente no encontrado.\n");
+    }
+    }
+
+
+    int buscarClientePorCedula(char *cedula, Cliente *clienteEncontrado) {
+    FILE *f;
+    Cliente c;
+
+    f = fopen("clientes.dat", "rb+");
+    if (f == NULL) {
+        return 0; // No hay archivo o no existen clientes
+    }
+
+    while (fread(&c, sizeof(Cliente), 1, f)) {
+        if (strcmp(c.cedula, cedula) == 0) {
+            *clienteEncontrado = c; // Copiar datos del cliente
+            fclose(f);
+            return 1; // Cliente encontrado
+        }
+    }
+
+    fclose(f);
+    return 0; // Cliente no encontrado
+}

@@ -12,9 +12,9 @@ typedef struct {
     int eliminado;
 } Vehiculo;
 
-typedef struct{
+typedef struct {
     char nombre[50];
-    int edad;
+    char cedula[15];
     char telefono[15];
 } Cliente;
 
@@ -52,11 +52,13 @@ int leerClientes(Cliente *clientes);
 void buscarVehiculoPorPlaca();
 void buscarVehiculosPorMarca();
 void buscarVehiculosPorPresupuesto();
+int pedirCedulaClienteVenta(Cliente *clienteVenta);
 void guardarVenta(Venta *venta);
 void venderVehiculo(Economia *eco);
 void mostrarVentas();
-void pedirDatosClienteVenta(Cliente *c);
+void buscarClienteMenu();
 void eliminarVehiculo();
 void informeGanancias(Economia *eco);
 void cargarEconomia(Economia *eco);
 void guardarEconomia(Economia *eco);
+int buscarClientePorCedula(char *cedula, Cliente *clienteEncontrado);
