@@ -25,31 +25,34 @@ int main(int argc, char const *argv[])
             mostrarVehiculos();
             break;
          case 4:
-            mostrarVentas();
+            mostrarClientes();
             break;
          case 5:
-            buscarVehiculoPorPlaca();
+            mostrarVentas();
             break;
          case 6:
-            buscarVehiculosPorMarca();
+            buscarVehiculoPorPlaca();
             break;
          case 7:
+            buscarVehiculosPorMarca();
+            break;
+         case 8:
             buscarVehiculosPorPresupuesto();
             break;
-         case 8: 
+         case 9: 
             buscarClienteMenu();
             break;
 
-         case 9:
+         case 10:
             venderVehiculo(&eco);
             break;
-         case 10:
+         case 11:
             eliminarVehiculo();
             break;
-         case 11:
+         case 12:
             informeGanancias(&eco);
             break;
-         case 12:
+         case 13:
             printf("Saliendo del sistema...\n");
             return 0;
         
@@ -58,7 +61,7 @@ int main(int argc, char const *argv[])
             break;
         }
    
-    } while(opc1 != 12);
+    } while(opc1 != 13);
 
   return 0;  
 }

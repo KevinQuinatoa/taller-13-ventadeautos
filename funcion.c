@@ -8,17 +8,18 @@
         printf("1. Registrar vehiculo\n");
         printf("2. Registrar cliente\n");
         printf("3. Mostrar vehiculos registrados\n");
-        printf("4. Mostrar datos de ventas\n");
-        printf("5. Buscar vehiculo por placa\n");
-        printf("6. Buscar vehiculos por marca\n");
-        printf("7. Buscar vehiculo por presupuesto\n");
-        printf("8. Buscar cliente\n");
-        printf("9. Vender vehiculo\n");
-        printf("10. Eliminar vehiculo\n");
-        printf("11. Informe de ganancias\n");
-        printf("12. Salir\n");
+        printf("4. Mostrar clientes registrados\n");
+        printf("5. Mostrar datos de ventas\n");
+        printf("6. Buscar vehiculo por placa\n");
+        printf("7. Buscar vehiculos por marca\n");
+        printf("8. Buscar vehiculo por presupuesto\n");
+        printf("9. Buscar cliente ya registrado para cambiar su presupuesto\n");
+        printf("10. Vender vehiculo\n");
+        printf("11. Eliminar vehiculo\n");
+        printf("12. Informe de ganancias\n");
+        printf("13. Salir\n");
         printf("Seleccione una opcion: ");
-        opc = opcionValida(1,12);
+        opc = opcionValida(1,13);
         return opc;
     }
 
@@ -42,6 +43,15 @@
         fgets(cadena, n, stdin);
         int len= strlen(cadena) - 1;
         cadena[len] = '\0';
+    }
+
+    int esSoloNumeros(const char *cadena){
+    for (int i = 0; cadena[i] != '\0'; i++){
+        if (cadena[i] < '0' || cadena[i] > '9'){
+            return 0;
+        }
+    }
+    return 1;
     }
 
     int menu2(){
@@ -254,13 +264,13 @@
     return opc;
     }
 
+
     void registrarCliente(){
     Cliente cliente;
 
     printf("Ingrese el nombre del cliente: ");
     eliminarSaltoLinea(cliente.nombre, 50);
 
-    // Edad
     printf("Ingrese la edad del cliente: ");
     cliente.edad = opcionValida(18, 100);
 
@@ -270,59 +280,29 @@
         printf("Ingrese la cedula del cliente (10 digitos): ");
         eliminarSaltoLinea(cliente.cedula, 15);
 
-        if (strlen(cliente.cedula) != 10){
-            printf("Error: la cedula debe tener 10 digitos.\n");
-            continue;
-        }
-
-        int esNumero = 1;
-        for (int i = 0; i < 10; i++){
-            if (cliente.cedula[i] < '0' || cliente.cedula[i] > '9'){
-                esNumero = 0;
-                break;
-            }
-        }
-
-        if (!esNumero){
-            printf("Error: la cedula solo debe contener numeros.\n");
+        if (strlen(cliente.cedula) != 10 || !esSoloNumeros(cliente.cedula)){
+            printf("Error: la cedula debe tener 10 digitos numericos.\n");
             continue;
         }
 
         valido = 1;
     }
 
-    // Teléfono
+    // Telefono
     valido = 0;
     while (!valido){
         printf("Ingrese el telefono del cliente (10 digitos): ");
         eliminarSaltoLinea(cliente.telefono, 15);
 
-        if (strlen(cliente.telefono) != 10){
-            printf("Error: el telefono debe tener 10 digitos.\n");
-            continue;
-        }
-
-        int esNumero = 1;
-        for (int i = 0; i < 10; i++){
-            if (cliente.telefono[i] < '0' || cliente.telefono[i] > '9'){
-                esNumero = 0;
-                break;
-            }
-        }
-
-        if (!esNumero){
-            printf("Error: el telefono solo debe contener numeros.\n");
+        if (strlen(cliente.telefono) != 10 || !esSoloNumeros(cliente.telefono)){
+            printf("Error: el telefono debe tener 10 digitos numericos.\n");
             continue;
         }
 
         valido = 1;
     }
 
-    // Asesor
-    printf("Ingrese el nombre del asesor que atiende al cliente: ");
-    eliminarSaltoLinea(cliente.asesor, 50);
-
-    // Efectivo disponible
+    // Efectivo
     printf("Ingrese el efectivo disponible del cliente: ");
     while (scanf("%f", &cliente.efectivo) != 1 || cliente.efectivo < 0){
         printf("Error. Ingrese un monto valido: ");
@@ -330,10 +310,30 @@
     }
     while (getchar() != '\n');
 
+    cliente.eliminado = 0;
+
     guardarCliente(&cliente);
     printf("Cliente registrado correctamente.\n");
     }
 
+
+
+    int existeCliente(char cedula[]) {
+    FILE *f = fopen("clientes.dat", "rb");
+    Cliente c;
+
+    if (f == NULL) return 0;
+
+    while (fread(&c, sizeof(Cliente), 1, f)) {
+        if (strcmp(c.cedula, cedula) == 0 && c.eliminado == 0) {
+            fclose(f);
+            return 1; // ya existe
+        }
+    }
+
+    fclose(f);
+    return 0;
+    }
 
 
     void mostrarVehiculos(){
@@ -398,19 +398,44 @@
 
 
 
-    void guardarCliente(Cliente *cliente){
-    FILE *f;
-    f = fopen("clientes.dat", "ab+");
-
-    if (f == NULL){
-        printf("No se puede abrir el archivo de clientes.\n");
+    void guardarCliente(Cliente *cliente) {
+    FILE *f = fopen("clientes.dat", "ab");
+    if (f == NULL) {
+        printf("Error al guardar cliente\n");
         return;
     }
 
     fwrite(cliente, sizeof(Cliente), 1, f);
     fclose(f);
+    }
 
-    printf("Cliente registrado correctamente.\n");
+    void mostrarClientes() {
+    FILE *f = fopen("clientes.dat", "rb");
+    Cliente c;
+    int hay = 0;
+
+    if (f == NULL) {
+        printf("No hay clientes registrados.\n");
+        return;
+    }
+
+    while (fread(&c, sizeof(Cliente), 1, f)) {
+        if (c.eliminado == 0) {
+            printf("Cedula: %s\n", c.cedula);
+            printf("Telefono: %s\n", c.telefono);
+            printf("Nombre: %s\n", c.nombre);
+            printf("Edad: %d\n", c.edad);
+            printf("Efectivo disponible: $%.2f\n", c.efectivo);
+            printf("--------------------------\n");
+            hay = 1;
+        }
+    }
+
+    if (!hay) {
+        printf("No hay clientes activos.\n");
+    }
+
+    fclose(f);
     }
 
 
@@ -690,6 +715,11 @@
                 fclose(f);
                 return;
             }
+                // ELIMINAR EFECTIVO DESPUES DE COMPRA
+                clienteVenta.efectivo = 0;
+
+                // ACTUALIZAR CLIENTE
+                actualizarCliente(clienteVenta);
 
             // Calcular ganancias
             if (v.tipoIngreso == 1) { // Compra
@@ -699,11 +729,10 @@
             }
 
             guardarEconomia(eco);
-
-            // Descontar dinero al cliente
-            clienteVenta.efectivo -= v.precio;
-            guardarCliente(&clienteVenta); // función que reescribe el cliente
-
+            // EL PRESUPUESTO SE ELIMINA
+            clienteVenta.efectivo = 0;
+            // Actualizar cliente
+            actualizarCliente(clienteVenta);
             // Marcar vehiculo como vendido
             v.disponible = 0;
 
@@ -734,6 +763,28 @@
     fclose(f);
     }
 
+    void actualizarCliente(Cliente clienteActualizado) {
+    FILE *f = fopen("clientes.dat", "rb+");
+    Cliente c;
+    long pos;
+
+    if (f == NULL) {
+        printf("Error al abrir archivo de clientes\n");
+        return;
+    }
+
+    while (fread(&c, sizeof(Cliente), 1, f)) {
+        if (strcmp(c.cedula, clienteActualizado.cedula) == 0 && c.eliminado == 0) {
+            pos = ftell(f) - sizeof(Cliente);
+            fseek(f, pos, SEEK_SET);
+            fwrite(&clienteActualizado, sizeof(Cliente), 1, f);
+            fclose(f);
+            return;
+        }
+    }
+
+    fclose(f); 
+    }
 
     void eliminarVehiculo() {
         FILE *f;
@@ -841,48 +892,48 @@
 
 
     void buscarClienteMenu() {
-    char cedula[15];
+     char cedula[15];
     Cliente cliente;
-
-    // Limpiar buffer antes de fgets
-    while (getchar() != '\n');
 
     printf("Ingrese la cedula del cliente: ");
     eliminarSaltoLinea(cedula, 15);
 
-    if (strlen(cedula) == 0) {
-        printf("No se ingreso ninguna cedula.\n");
+    if (!buscarClientePorCedula(cedula, &cliente)){
+        printf("Cliente no encontrado.\n");
         return;
     }
 
-    if (buscarClientePorCedula(cedula, &cliente)) {
-        printf("\n--- CLIENTE ENCONTRADO ---\n");
-        printf("Nombre  : %s\n", cliente.nombre);
-        printf("Cedula  : %s\n", cliente.cedula);
-        printf("Telefono: %s\n", cliente.telefono);
-    } else {
-        printf("Cliente no encontrado.\n");
+    printf("\nCliente encontrado:\n");
+    printf("Nombre: %s\n", cliente.nombre);
+    printf("Presupuesto actual: $%.2f\n", cliente.efectivo);
+
+    printf("\nIngrese el nuevo presupuesto: ");
+    while (scanf("%f", &cliente.efectivo) != 1 || cliente.efectivo < 0){
+        printf("Error. Ingrese un monto valido: ");
+        while (getchar() != '\n');
     }
+    while (getchar() != '\n');
+
+    actualizarCliente(cliente);
+
+    printf("Presupuesto actualizado correctamente.\n");
     }
 
 
-    int buscarClientePorCedula(char *cedula, Cliente *clienteEncontrado) {
-    FILE *f;
+    int buscarClientePorCedula(char cedulaBuscada[], Cliente *clienteEncontrado) {
+    FILE *f = fopen("clientes.dat", "rb");
     Cliente c;
 
-    f = fopen("clientes.dat", "rb+");
-    if (f == NULL) {
-        return 0; // No hay archivo o no existen clientes
-    }
+    if (f == NULL) return 0;
 
     while (fread(&c, sizeof(Cliente), 1, f)) {
-        if (strcmp(c.cedula, cedula) == 0) {
-            *clienteEncontrado = c; // Copiar datos del cliente
+        if (strcmp(c.cedula, cedulaBuscada) == 0 && c.eliminado == 0) {
+            *clienteEncontrado = c;
             fclose(f);
-            return 1; // Cliente encontrado
+            return 1; // encontrado
         }
     }
 
     fclose(f);
-    return 0; // Cliente no encontrado
+    return 0; // no encontrado
 }

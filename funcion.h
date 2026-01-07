@@ -20,15 +20,15 @@ typedef struct{
     int edad;
     char cedula[15];
     char telefono[15];
-    char asesor[50];
     float efectivo;   // Dinero disponible del cliente
+    int eliminado;
 } Cliente;
 
 
 typedef struct {
     Vehiculo vehiculo;
     Cliente cliente;
-    char vendedor[50];   // 👈 NUEVO
+    char vendedor[50];   // NUEVO
     float montoVenta;
 } Venta;
 
@@ -40,7 +40,8 @@ typedef struct {
 
 int menu();
 int opcionValida(int min, int max);
-void eliminarSaltoLinea(char *cadena, int n);   
+void eliminarSaltoLinea(char *cadena, int n);
+int esSoloNumeros(const char *cadena);
 int menu2();
 int menuToyota();
 int menuChevrolet();
@@ -65,8 +66,11 @@ void guardarVenta(Venta *venta);
 void venderVehiculo(Economia *eco);
 void mostrarVentas();
 void buscarClienteMenu();
+void actualizarCliente(Cliente clienteActualizado) ;
 void eliminarVehiculo();
 void informeGanancias(Economia *eco);
 void cargarEconomia(Economia *eco);
 void guardarEconomia(Economia *eco);
-int buscarClientePorCedula(char *cedula, Cliente *clienteEncontrado);
+int buscarClientePorCedula(char cedulaBuscada[], Cliente *clienteEncontrado);
+void mostrarClientes();
+int existeCliente(char cedula[]);
